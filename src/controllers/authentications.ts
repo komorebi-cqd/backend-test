@@ -2,8 +2,8 @@ import express from 'express';
 import { getUserByEmail, createUser } from '../db/users';
 import { random, authentication } from '../helpers/index';
 
+
 export const login = async (req: express.Request, res: express.Response) => {
-    console.log(req.body)
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -14,8 +14,6 @@ export const login = async (req: express.Request, res: express.Response) => {
         if (!user) {
             return res.sendStatus(400)
         };
-
-        console.log(user, 'user::::::')
 
         const expectedHash = authentication(user.authentication.salt, password);  //重新加密对比
         if (expectedHash !== user.authentication.password) {
@@ -28,8 +26,7 @@ export const login = async (req: express.Request, res: express.Response) => {
         await user.save();
 
         res.cookie('BACKEND-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
-
-        return res.status(200).json(user);
+        return res.status(200).json(user).end();
 
     } catch (error) {
         return res.sendStatus(400);
